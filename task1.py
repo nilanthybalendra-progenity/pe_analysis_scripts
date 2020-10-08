@@ -14,12 +14,12 @@ data_dir = Path('/mnt/ruo_rw/rnd/staff/nilanthy.balendra/pe_analysis/data')
 output_dir = Path('/mnt/ruo_rw/rnd/staff/nilanthy.balendra/pe_analysis/plots')
 
 # read in optimization data
-opt_concs = pd.read_csv(data_dir / 'optimization_data_reformatted_20200925.csv', header=0)
+opt_concs = pd.read_csv(data_dir / 'optimization_data_reformatted_20200928.csv', header=0)
 opt_concs.rename(columns={'Sample_ID': 'SID', 'Dataset': 'Phase', 'Perc_free_PlGF' : 'PlGF(%f)'}, inplace=True)
 opt_concs = opt_concs.loc[opt_concs['Visit'] == 'Baseline']
 
 # read in PRO-129 clinical verification data
-ver_concs = pd.read_csv(data_dir / 'PRO-129_clinical_verification_data_merged_20200925.csv', header=0)
+ver_concs = pd.read_csv(data_dir / 'PRO-129_clinical_verification_data_merged_20200928.csv', header=0)
 ver_concs.rename(columns={'Dataset': 'Phase', 'Perc_free_PlGF' : 'PlGF(%f)'}, inplace=True)
 ver_concs = ver_concs.loc[ver_concs['Visit'] == 'Baseline']
 
@@ -35,17 +35,18 @@ data_set = pd.concat([opt_concs[markers + other], ver_concs[markers + other]], a
 data = pd.melt(data_set, id_vars=other, value_vars=markers, var_name='Markers', value_name='Conc')
 data['Phase-Class'] = data['Phase'] + '-' + data['Class']
 
-#data.to_csv('test.tsv', sep='\t', index=None)
+data.to_csv('test.tsv', sep='\t', index=None)
 
 di = {
     'Optimization-Non-PE': 'Opt-NonPE', 
     'Optimization-PE': 'Opt-PE', 
-    'PRO-129-PE': 'PRO-129-PE', 
     'PRO-129-Non-PE': 'PRO-129-NonPE'
     }
-data = data.replace({'Phase-Class': di})
+data = data.replace(di)
 cat_type = CategoricalDtype(categories=['Opt-NonPE', 'PRO-129-NonPE', 'Opt-PE', 'PRO-129-PE'], ordered=True)
 data['Phase-Class'] = data['Phase-Class'].astype(cat_type)
+
+data.to_csv('data_reorg.tsv', sep='\t', index=None)
 
 #colors
 class_cols = {'Non-PE': '#3182bd', 'PE': '#e6550d'}
